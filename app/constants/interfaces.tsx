@@ -33,7 +33,7 @@ export interface VisualDisplayProps {
 };
 
 export interface TimelineProps {
-    entries: JournalEntryData[];
+    // entries: JournalEntryData[];
     onBack: () => void;
     onSelectEntry: (entry: JournalEntryData) => void;
 };

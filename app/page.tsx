@@ -85,6 +85,7 @@ export default function Home() {
     setIsProcessing(true);
     setCurrentEntry(entry);
 
+
     const res = await fetch("/api/analyze", {
       method: "POST",
       headers: {
@@ -95,9 +96,11 @@ export default function Home() {
 
     const data = await res.json();
 
+
     setCurrentEmotion(data.emotion);
     setCurrentReflection(data.reflection);
     setCurrentVisuals(data.visual);
+
 
     const newEntry: JournalEntryData = {
       id: Date.now().toString(),
@@ -107,6 +110,16 @@ export default function Home() {
       emotion: data.emotion,
       visual: data.visual,
     };
+
+    await fetch("/api/entry/create", {
+      method: "POST",
+      body: JSON.stringify({
+        currentEntry,
+        currentEmotion,
+        currentReflection,
+        visual
+      })
+    });
 
     setEntries(prev => [newEntry, ...prev]);
     setIsProcessing(false);
@@ -153,7 +166,7 @@ export default function Home() {
 
       {view === 'timeline' && (
         <Timeline
-          entries={entries}
+          // entries={entries}
           onBack={() => setView('entry')}
           onSelectEntry={handleViewEntry}
         />

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { JournalEntryData, TimelineProps } from '@/app/constants/interfaces';
 
@@ -41,12 +41,21 @@ function MiniVisual({ entry }: { entry: JournalEntryData }) {
     return <canvas ref={canvasRef} className="w-full h-full rounded-2xl" />;
 }
 
-export default function Timeline({ entries, onBack, onSelectEntry }: TimelineProps) {
-    const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [selectedEntry, setSelectedEntry] = useState<JournalEntryData | null>(null);
+export default function Timeline({ onBack, onSelectEntry }: TimelineProps) {
+    const [entries, setEntries] = useState<JournalEntryData[]>([]);
 
-    const [showEntries, setShowEntries] = useState(true);
-    const [highlightToday, setHighlightToday] = useState(false);
+    const fetchEntriesFromDB = async () => {
+        const res = await fetch("/api/entries/month", {
+            method: "POST",
+            body: JSON.stringify({
+                year: currentMonth.getFullYear(),
+                month: currentMonth.getMonth()
+            })
+        });
+
+        const data = await res.json();
+        setEntries(data);
+    }
 
     const getDaysInMonth = (date: Date) => {
         const year = date.getFullYear();
@@ -59,8 +68,6 @@ export default function Timeline({ entries, onBack, onSelectEntry }: TimelinePro
         return { daysInMonth, startingDayOfWeek };
     };
 
-    const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
-
     const getEntryForDate = (day: number) => {
         const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
         return entries.find(
@@ -68,17 +75,26 @@ export default function Timeline({ entries, onBack, onSelectEntry }: TimelinePro
                 entry.date.toDateString() === date.toDateString()
         );
     };
-
     const previousMonth = () => {
         setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
+        fetchEntriesFromDB();
     };
 
     const nextMonth = () => {
         setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
+        fetchEntriesFromDB();
     };
 
 
+    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [selectedEntry, setSelectedEntry] = useState<JournalEntryData | null>(null);
+    const [showEntries, setShowEntries] = useState(true);
+    const [highlightToday, setHighlightToday] = useState(false);
     const todayDate = new Date();
+
+    const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
+    fetchEntriesFromDB();
+
     const todayEntry = entries.find(
         entry => entry.date.toDateString() === todayDate.toDateString()
     );
@@ -91,6 +107,7 @@ export default function Timeline({ entries, onBack, onSelectEntry }: TimelinePro
             setSelectedEntry(null);
         }
     }, [highlightToday, todayEntry]);
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-stone-50 to-amber-50">
@@ -133,25 +150,7 @@ export default function Timeline({ entries, onBack, onSelectEntry }: TimelinePro
                                     </div>
                                 )}
                             </div>
-                            {/* <div className="flex justify-between items-center mb-8">
-                                <h2 className="text-2xl font-light text-stone-800">
-                                    {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                                </h2>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={previousMonth}
-                                        className="p-2 rounded-full hover:bg-stone-100 transition-colors"
-                                    >
-                                        <ChevronLeft className="w-5 h-5 text-stone-600" />
-                                    </button>
-                                    <button
-                                        onClick={nextMonth}
-                                        className="p-2 rounded-full hover:bg-stone-100 transition-colors"
-                                    >
-                                        <ChevronRight className="w-5 h-5 text-stone-600" />
-                                    </button>
-                                </div>
-                            </div> */}
+
 
                             {highlightToday ? (
                                 /* ---------------- TODAY MODE ---------------- */

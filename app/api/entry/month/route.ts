@@ -19,7 +19,8 @@ export async function POST(req: Request) {
             entry: 1,
             reflection: 1,
             emotion: 1,
-            date: 1
+            date: 1,
+            visual: 1
         })
         .toArray();
 

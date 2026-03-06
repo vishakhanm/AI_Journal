@@ -3,7 +3,7 @@ import { ArrowLeft, Download, MessageCircle } from 'lucide-react';
 import { VisualDisplayProps } from '@/app/constants/interfaces';
 
 
-export default function VisualDisplay({ emotion, reflection, entry, visualData, onBack, onChat }: VisualDisplayProps) {
+export default function VisualDisplay({ journalEntry, onBack, onChat }: VisualDisplayProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -34,16 +34,16 @@ export default function VisualDisplay({ emotion, reflection, entry, visualData, 
             alpha: number;
         }> = [];
 
-        const numParticles = Math.floor(visualData.density * 50);
+        const numParticles = Math.floor(journalEntry.visual.density * 50);
 
         for (let i = 0; i < numParticles; i++) {
             particles.push({
                 x: Math.random() * rect.width,
                 y: Math.random() * rect.height,
-                vx: (Math.random() - 0.5) * (visualData.motion_style === 'turbulent' ? 2 : 0.5),
-                vy: (Math.random() - 0.5) * (visualData.motion_style === 'turbulent' ? 2 : 0.5),
+                vx: (Math.random() - 0.5) * (journalEntry.visual.motion_style === 'turbulent' ? 2 : 0.5),
+                vy: (Math.random() - 0.5) * (journalEntry.visual.motion_style === 'turbulent' ? 2 : 0.5),
                 size: Math.random() * 30 + 10,
-                color: visualData.color_palette[Math.floor(Math.random() * visualData.color_palette.length)],
+                color: journalEntry.visual.color_palette[Math.floor(Math.random() * journalEntry.visual.color_palette.length)],
                 alpha: Math.random() * 0.3 + 0.2,
             });
         }
@@ -53,7 +53,7 @@ export default function VisualDisplay({ emotion, reflection, entry, visualData, 
             ctx.fillRect(0, 0, rect.width, rect.height);
 
             particles.forEach((p, i) => {
-                if (visualData.motion_style !== 'static') {
+                if (journalEntry.visual.motion_style !== 'static') {
                     p.x += p.vx;
                     p.y += p.vy;
 
@@ -61,7 +61,7 @@ export default function VisualDisplay({ emotion, reflection, entry, visualData, 
                     if (p.y < 0 || p.y > rect.height) p.vy *= -1;
                 }
 
-                const wave = visualData.motion_style === 'flowing'
+                const wave = journalEntry.visual.motion_style === 'flowing'
                     ? Math.sin(time * 0.01 + i * 0.1) * 20
                     : 0;
 
@@ -82,7 +82,7 @@ export default function VisualDisplay({ emotion, reflection, entry, visualData, 
         return () => {
             cancelAnimationFrame(animationId);
         };
-    }, [emotion]);
+    }, [journalEntry.emotion]);
 
     const downloadVisual = () => {
         const canvas = canvasRef.current;
@@ -127,12 +127,12 @@ export default function VisualDisplay({ emotion, reflection, entry, visualData, 
                     <div className="space-y-6">
                         <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-8">
                             <h2 className="text-sm font-medium text-stone-500 mb-4">YOUR ENTRY</h2>
-                            <p className="text-stone-700 leading-relaxed">{entry}</p>
+                            <p className="text-stone-700 leading-relaxed">{journalEntry.entry}</p>
                         </div>
 
                         <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-8">
                             <h2 className="text-sm font-medium text-stone-500 mb-4">REFLECTION</h2>
-                            <p className="text-stone-700 leading-relaxed italic">{reflection}</p>
+                            <p className="text-stone-700 leading-relaxed italic">{journalEntry.reflection}</p>
                         </div>
 
                         <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-8">
@@ -140,17 +140,17 @@ export default function VisualDisplay({ emotion, reflection, entry, visualData, 
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
                                     <span className="text-stone-600">Primary emotion</span>
-                                    <span className="font-medium text-stone-800">{emotion.primaryEmotion}</span>
+                                    <span className="font-medium text-stone-800">{journalEntry.emotion.primaryEmotion}</span>
                                 </div>
                                 <div className="flex justify-between items-start mt-2">
                                     <span className="text-stone-600">Secondary emotions</span>
                                     <span className="font-medium text-stone-800 text-right max-w-[60%]">
-                                        {emotion.secondaryEmotion.join(', ')}
+                                        {journalEntry.emotion.secondaryEmotion.join(', ')}
                                     </span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-stone-600">Tone</span>
-                                    <span className="font-medium text-stone-800">{emotion.tone}</span>
+                                    <span className="font-medium text-stone-800">{journalEntry.emotion.tone}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="text-stone-600">Intensity</span>
@@ -158,7 +158,7 @@ export default function VisualDisplay({ emotion, reflection, entry, visualData, 
                                         {[...Array(5)].map((_, i) => (
                                             <div
                                                 key={i}
-                                                className={`w-2 h-6 rounded-full ${i < Math.floor(emotion.intensity * 5)
+                                                className={`w-2 h-6 rounded-full ${i < Math.floor(journalEntry.emotion.intensity * 5)
                                                     ? 'bg-gradient-to-t from-amber-400 to-orange-400'
                                                     : 'bg-stone-200'
                                                     }`}

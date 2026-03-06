@@ -1,29 +1,46 @@
 // TODO: tight prompt for chat to avoid advice
 "use client";
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import { ArrowLeft, Send } from 'lucide-react';
-import { ChatProps, Message } from '@/app/constants/interfaces';
+import { ChatProps, ChatMessage, ChatHistory } from '@/app/constants/interfaces';
 
 
 
-export default function Chat({ entry, reflection, onBack }: ChatProps) {
-    const [messages, setMessages] = useState<Message[]>([
+export default function Chat({ entry, reflection, entryId, onBack }: ChatProps) {
+
+    // const fetchChatHistory = async (entryId: string) => {
+    const [messages, setMessages] = useState<ChatMessage[]>([
         {
-            id: '1',
+            // id: '0',
             role: 'user',
             content: entry,
         },
         {
-            id: '0',
+            // id: '1',
             role: 'assistant',
             content: reflection,
         },
         {
-            id: Date.now().toString(),
+            // id: Date.now().toString(),
             role: 'assistant',
             content: `I'm here to listen and explore what you wrote. Feel free to share more about what you experienced or how you're feeling right now.`,
         },
     ]);
+
+
+    useEffect(() => {
+        console.log('Fetching chat history for entryId:', entryId);
+        fetch(`/api/chat/${entryId}`)
+            .then(res => res.json())
+            .then(history => {
+
+                if (history?.messages.length > 0) {
+                    setMessages(prev => [...prev, ...history.messages]);
+                }
+            })
+    }, []);
+
+
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -41,14 +58,14 @@ export default function Chat({ entry, reflection, onBack }: ChatProps) {
         e.preventDefault();
         if (!input.trim()) return;
 
-        const userMessage: Message = {
-            id: Date.now().toString(),
+        const userMessage: ChatMessage = {
+            // id: Date.now().toString(),
             role: 'user',
             content: input,
         };
 
         setMessages(prev => [...prev, userMessage]);
-        console.log('Updated messages:', messages);
+        // console.log('Updated messages:', messages);
         setInput('');
         setIsLoading(true);
 
@@ -113,20 +130,31 @@ Avoid therapy clichés.
             const data = await response.json();
             const aiResponse = data.message.content;
 
-            const assistantMessage: Message = {
-                id: (Date.now() + 1).toString(),
+            const assistantMessage: ChatMessage = {
+                // id: (Date.now() + 1).toString(),
                 role: 'assistant',
                 content: aiResponse,
             };
 
             setMessages(prev => [...prev, assistantMessage]);
+            await fetch("/api/chat/save", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    entryId,
+                    messages: [userMessage, assistantMessage]
+                })
+            });
+
         } catch (error) {
             console.error('Chat error:', error);
 
             const mockResponse = `I hear what you're saying. It sounds like you're exploring something important here. What stands out most to you about that?`;
 
-            const assistantMessage: Message = {
-                id: (Date.now() + 1).toString(),
+            const assistantMessage: ChatMessage = {
+                // id: (Date.now() + 1).toString(),
                 role: 'assistant',
                 content: mockResponse,
             };
@@ -153,7 +181,7 @@ Avoid therapy clichés.
                 <div className="max-w-2xl mx-auto space-y-6">
                     {messages.map(message => (
                         <div
-                            key={message.id}
+                            // key={message.id}
                             className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                             <div

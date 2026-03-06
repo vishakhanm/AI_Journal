@@ -18,68 +18,8 @@ export default function Home() {
   const [currentEmotion, setCurrentEmotion] = useState<EmotionData | null>(null);
   const [currentReflection, setCurrentReflection] = useState<string>('');
   const [visual, setCurrentVisuals] = useState<VisualData | null>(null);
-  const [entries, setEntries] = useState<JournalEntryData[]>([
-    {
-      id: '1',
-      date: new Date(2026, 1, 15),
-      entry: 'Today was challenging but I made it through. The morning started rough but by afternoon I found my rhythm.',
-      reflection: 'You navigated through difficulty with patience. Notice how you found your way back to balance.',
-      emotion: {
-        primaryEmotion: 'Resilient',
-        secondaryEmotion: ['Determined', 'Tired'],
-        intensity: 0.6,
-        tone: 'Reflective',
-        keywords: ['challenge', 'balance', 'patience'],
-      },
-      visual: {
-        color_palette: ['#64748B', '#94A3B8', '#475569'],
-        motion_style: 'flowing',
-        shape_style: 'organic',
-        contrast: 'medium',
-        density: 0.5,
-      },
-    },
-    {
-      id: '2',
-      date: new Date(2026, 1, 18),
-      entry: 'Feeling overwhelmed with everything on my plate. Too many decisions, not enough time.',
-      reflection: 'The weight you feel is real. Sometimes acknowledging the overwhelm is the first step to lightness.',
-      emotion: {
-        primaryEmotion: 'Overwhelmed',
-        secondaryEmotion: ['Anxious'],
-        intensity: 0.8,
-        tone: 'Anxious',
-        keywords: ['overwhelm', 'decisions', 'time'],
-      },
-      visual: {
-        color_palette: ['#DC2626', '#F87171', '#B91C1C'],
-        motion_style: 'turbulent',
-        shape_style: 'sharp',
-        contrast: 'high',
-        density: 0.8,
-      },
-    },
-    {
-      id: '3',
-      date: new Date(2026, 1, 20),
-      entry: 'Lovely quiet day. Read a book, took a walk, felt at peace. These are the moments I want to remember.',
-      reflection: 'You found stillness today. This peace is always available to you, even in small moments.',
-      emotion: {
-        primaryEmotion: 'Peaceful',
-        secondaryEmotion: ['Content'],
-        intensity: 0.3,
-        tone: 'Calm',
-        keywords: ['peace', 'stillness', 'contentment'],
-      },
-      visual: {
-        color_palette: ['#34D399', '#6EE7B7', '#10B981'],
-        motion_style: 'calm',
-        shape_style: 'soft',
-        contrast: 'low',
-        density: 0.3,
-      },
-    },
-  ]);
+  const [journalEntry, setJournalEntry] = useState<JournalEntryData | null>(null);
+
 
   const handleSubmitEntry = async (entry: string) => {
     setIsProcessing(true);
@@ -103,35 +43,43 @@ export default function Home() {
 
 
     const newEntry: JournalEntryData = {
-      id: Date.now().toString(),
+      // id: Date.now().toString(),
       date: new Date(),
       entry,
       reflection: data.reflection,
       emotion: data.emotion,
       visual: data.visual,
     };
+    setJournalEntry(newEntry);
 
-    await fetch("/api/entry/create", {
+    const id = await fetch("/api/entry/create", {
       method: "POST",
       body: JSON.stringify({
-        currentEntry,
-        currentEmotion,
-        currentReflection,
-        visual
+        entry,
+        emotion: data.emotion,
+        reflection: data.reflection,
+        visual: data.visual
       })
     });
 
-    setEntries(prev => [newEntry, ...prev]);
+    newEntry._id = (await id.json()).id;
+    setJournalEntry(newEntry);
+
+    // setEntries(prev => [newEntry, ...prev]);
     setIsProcessing(false);
     setView('visual');
   }
 
 
   const handleViewEntry = (entry: JournalEntryData) => {
+    // const res = await fetch(`/api/entry/${id}`);
+    // const data = await res.json();
     setCurrentEntry(entry.entry);
     setCurrentEmotion(entry.emotion);
     setCurrentReflection(entry.reflection);
     setCurrentVisuals(entry.visual);
+    setJournalEntry(entry);
+    console.log('Selected entry:', entry);
     setView('visual');
   };
 
@@ -145,12 +93,9 @@ export default function Home() {
         />
       )}
 
-      {view === 'visual' && currentEmotion && visual && (
+      {view === 'visual' && journalEntry && (
         <VisualDisplay
-          emotion={currentEmotion}
-          reflection={currentReflection}
-          entry={currentEntry}
-          visualData={visual}
+          journalEntry={journalEntry}
           onBack={() => setView('entry')}
           onChat={() => setView('chat')}
         />
@@ -160,6 +105,7 @@ export default function Home() {
         <Chat
           entry={currentEntry}
           reflection={currentReflection}
+          entryId={journalEntry?._id || ''}
           onBack={() => setView('visual')}
         />
       )}

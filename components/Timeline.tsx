@@ -45,7 +45,7 @@ export default function Timeline({ onBack, onSelectEntry }: TimelineProps) {
     const [entries, setEntries] = useState<JournalEntryData[]>([]);
 
     const fetchEntriesFromDB = async () => {
-        const res = await fetch("/api/entries/month", {
+        const res = await fetch("/api/entry/month", {
             method: "POST",
             body: JSON.stringify({
                 year: currentMonth.getFullYear(),
@@ -72,17 +72,17 @@ export default function Timeline({ onBack, onSelectEntry }: TimelineProps) {
         const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
         return entries.find(
             entry =>
-                entry.date.toDateString() === date.toDateString()
+                new Date(entry.date).toDateString() === date.toDateString()
         );
     };
     const previousMonth = () => {
         setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-        fetchEntriesFromDB();
+        // fetchEntriesFromDB();
     };
 
     const nextMonth = () => {
         setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-        fetchEntriesFromDB();
+        // fetchEntriesFromDB();
     };
 
 
@@ -93,10 +93,13 @@ export default function Timeline({ onBack, onSelectEntry }: TimelineProps) {
     const todayDate = new Date();
 
     const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
-    fetchEntriesFromDB();
+    useEffect(() => {
+        fetchEntriesFromDB();
+    }, [currentMonth]);
+    // console.log('Entries for month:', entries);
 
     const todayEntry = entries.find(
-        entry => entry.date.toDateString() === todayDate.toDateString()
+        entry => new Date(entry.date).toDateString() === todayDate.toDateString()
     );
     const displayDate = highlightToday ? todayDate : currentMonth;
 
@@ -106,7 +109,7 @@ export default function Timeline({ onBack, onSelectEntry }: TimelineProps) {
         } else {
             setSelectedEntry(null);
         }
-    }, [highlightToday, todayEntry]);
+    }, [highlightToday]);
 
 
     return (
@@ -260,7 +263,7 @@ export default function Timeline({ onBack, onSelectEntry }: TimelineProps) {
                                     <div className="bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 p-8 space-y-6">
                                         <div>
                                             <h3 className="text-sm font-medium text-stone-500 mb-2">
-                                                {selectedEntry.date.toLocaleDateString('en-US', {
+                                                {new Date(selectedEntry.date).toLocaleDateString('en-US', {
                                                     weekday: 'long',
                                                     year: 'numeric',
                                                     month: 'long',

@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export interface EmotionData {
     primaryEmotion: string;
     secondaryEmotion: string[];
@@ -15,7 +17,7 @@ export interface VisualData {
 };
 
 export interface JournalEntryData {
-    id: string;
+    _id?: string;
     date: Date;
     entry: string;
     reflection: string;
@@ -24,10 +26,7 @@ export interface JournalEntryData {
 };
 
 export interface VisualDisplayProps {
-    emotion: EmotionData;
-    reflection: string;
-    entry: string;
-    visualData: VisualData;
+    journalEntry: JournalEntryData;
     onBack: () => void;
     onChat: () => void;
 };
@@ -38,14 +37,20 @@ export interface TimelineProps {
     onSelectEntry: (entry: JournalEntryData) => void;
 };
 
-export interface Message {
-    id: string;
-    role: 'user' | 'assistant';
+export interface ChatMessage {
+    // id: string;
+    role: 'user' | 'assistant' | 'system';
     content: string;
 };
+
+export interface ChatHistory {
+    entryId: ObjectId;
+    messages: ChatMessage[]
+}
 
 export interface ChatProps {
     entry: string;
     reflection: string;
+    entryId: string;
     onBack: () => void;
 }

@@ -29,16 +29,20 @@ export default function Chat({ entry, reflection, entryId, onBack }: ChatProps) 
 
 
     useEffect(() => {
+        let ignore = false;
         console.log('Fetching chat history for entryId:', entryId);
         fetch(`/api/chat/${entryId}`)
             .then(res => res.json())
             .then(history => {
 
-                if (history?.messages.length > 0) {
-                    setMessages(prev => [...prev, ...history.messages]);
+                if (!ignore && history.length > 0) {
+                    setMessages(prev => [...prev, ...history]);
                 }
-            })
-    }, []);
+            });
+        return () => {
+            ignore = true; // Set to true when component unmounts
+        };
+    }, [entryId]);
 
 
     const [input, setInput] = useState('');

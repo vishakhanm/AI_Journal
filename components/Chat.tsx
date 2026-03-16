@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, use } from 'react';
 import { ArrowLeft, Send } from 'lucide-react';
 import { ChatProps, ChatMessage, ChatHistory } from '@/app/constants/interfaces';
+import { SYSTEM_CONTEXT } from '@/lib/ai/systemContext';
 
 
 
@@ -27,9 +28,31 @@ export default function Chat({ entry, reflection, entryId, onBack }: ChatProps) 
         },
     ]);
 
+    let systemMessage = "";
+
 
     useEffect(() => {
         let ignore = false;
+        fetch("/api/vector/search", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                text: entry
+            })
+        }).then(res => res.json())
+            .then(vectorContext => {
+                const similarHistory = vectorContext
+                    .map((v: any) =>
+                        `Past emotion: ${v.emotion} (similarity ${v.score.toFixed(2)})`
+                    )
+                    .join("\n");
+                // sys msg
+                systemMessage = SYSTEM_CONTEXT.replace("{{similarHistory}}", similarHistory);
+            });
+
+
         console.log('Fetching chat history for entryId:', entryId);
         fetch(`/api/chat/${entryId}`)
             .then(res => res.json())
@@ -39,6 +62,7 @@ export default function Chat({ entry, reflection, entryId, onBack }: ChatProps) 
                     setMessages(prev => [...prev, ...history]);
                 }
             });
+
         return () => {
             ignore = true; // Set to true when component unmounts
         };
@@ -75,44 +99,12 @@ export default function Chat({ entry, reflection, entryId, onBack }: ChatProps) 
 
         try {
             const apiUrl = "http://localhost:11434/api/chat";
-            const systemMessage = {
+            const system = {
                 role: "system",
-                content: `
-You are a calm, emotionally intelligent reflective companion.
-
-Your role:
-- Help the user better understand their emotions.
-- Gently interpret emotional undertones.
-- Reflect patterns you notice.
-- Clarify feelings in simple language.
-
-Rules:
-- Do NOT give advice.
-- Do NOT suggest actions or solutions.
-- Do NOT tell the user what they "should" do.
-- Do NOT diagnose.
-- Do NOT moralize.
-- Do NOT overanalyze clinically.
-
-Tone:
-- Calm
-- Polite
-- Grounded
-- Supportive but not overly warm
-- Clear and emotionally aware
-
-You may:
-- Ask gentle follow-up questions.
-- Help name emotions.
-- Reflect contradictions or tensions.
-- Notice emotional shifts.
-
-Keep responses concise and human.
-Avoid therapy clichés.
-`,
+                content: systemMessage
             };
             const fullHistory = [
-                systemMessage,
+                system,
                 ...messages.map(m => ({ role: m.role, content: m.content })),
                 { role: userMessage.role, content: userMessage.content } // Add the new message here
             ];

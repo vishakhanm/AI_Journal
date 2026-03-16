@@ -16,6 +16,9 @@ export async function POST(req: Request) {
         visual: body.visual
     });
 
+    // console.log("Inserted entry with ID:", result.insertedId);
+
+
     return NextResponse.json({
         success: true,
         id: result.insertedId

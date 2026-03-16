@@ -63,6 +63,14 @@ export default function Home() {
     });
 
     newEntry._id = (await id.json()).id;
+
+    await fetch("/api/vector/store", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newEntry)
+    });
     setJournalEntry(newEntry);
 
     // setEntries(prev => [newEntry, ...prev]);

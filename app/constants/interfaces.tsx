@@ -54,3 +54,14 @@ export interface ChatProps {
     entryId: string;
     onBack: () => void;
 }
+
+export interface VectorDocument {
+    entryId: ObjectId;
+    date: Date;
+    emotion: string;
+    embedding: number[];
+    metadata?: {
+        secondaryEmotion?: string[];
+        intensity?: number;
+    };
+}

@@ -35,6 +35,14 @@ export interface TimelineProps {
     // entries: JournalEntryData[];
     onBack: () => void;
     onSelectEntry: (entry: JournalEntryData) => void;
+    onAnalyze: () => void;
+};
+
+export interface AnalyzeHistoryProps {
+    // entries: JournalEntryData[];
+    onBack: () => void;
+    // onSelectEntry: (entry: JournalEntryData) => void;
+    // onAnalyze: () => void;
 };
 
 export interface ChatMessage {

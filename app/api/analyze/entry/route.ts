@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateEmotion } from "@/lib/ai/emotion";
 import { generateReflection } from "@/lib/ai/reflection";
-import { EmotionSchema, VisualSchema } from "@/lib/ai/schema";
+import { EmotionSchema, VisualSchema } from "@/lib/utilities/schema";
 import { generateVisualParams } from "@/lib/ai/visual";
 
 

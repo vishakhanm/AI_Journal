@@ -2,7 +2,7 @@ import clientPromise from "@/lib/database/mongodb";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { generateEmbedding } from "@/lib/ai/embeddings";
-import { buildEmbeddingText } from "@/lib/ai/buildEmbeddingText";
+import { buildEmbeddingText } from "@/lib/utilities/buildEmbeddingText";
 
 export async function POST(req: Request) {
 

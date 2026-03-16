@@ -1,4 +1,4 @@
-import { REFLECTION_PROMPT } from "./reflectionPrompt";
+import { REFLECTION_PROMPT } from "./prompts/reflectionPrompt";
 
 export async function generateReflection(emotionJson: object) {
     const prompt = REFLECTION_PROMPT.replace(

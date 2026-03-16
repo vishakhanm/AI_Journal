@@ -1,4 +1,4 @@
-import { VISUAL_PROMPT } from "./visualPrompt";
+import { VISUAL_PROMPT } from "./prompts/visualPrompt";
 
 export async function generateVisualParams(emotionJson: object) {
     const prompt = VISUAL_PROMPT.replace(

@@ -1,9 +1,8 @@
-// /lib/ai/emotion.ts
+import { ANALYZE_HISTORY_PROMPT } from "./prompts/analyzeHistoryPrompt";
 
-import { EMOTION_PROMPT } from "./prompts/prompts";
 
-export async function generateEmotion(userText: string) {
-    const prompt = EMOTION_PROMPT.replace("{{USER_TEXT}}", userText);
+export async function generateHistoryAnalysis(context: string) {
+    const prompt = ANALYZE_HISTORY_PROMPT.replace("{{context}}", context);
 
     const response = await fetch("http://localhost:11434/api/generate", {
         method: "POST",
@@ -17,5 +16,5 @@ export async function generateEmotion(userText: string) {
 
     const data = await response.json();
 
-    return data.response.trim();
+    return data;
 }

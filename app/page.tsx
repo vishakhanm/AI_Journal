@@ -6,10 +6,11 @@ import VisualDisplay from '@/components/VisualDisplay';
 import Timeline from '@/components/Timeline';
 import Chat from '@/components/Chat';
 import { EmotionData, JournalEntryData, VisualData } from "@/app/constants/interfaces";
+import AnalyzeHistory from "@/components/AnalyzeHistory";
 
 export default function Home() {
 
-  type View = 'entry' | 'visual' | 'timeline' | 'chat';
+  type View = 'entry' | 'visual' | 'timeline' | 'chat' | 'analyze';
 
   // function App() {
   const [view, setView] = useState<View>('entry');
@@ -123,6 +124,16 @@ export default function Home() {
           // entries={entries}
           onBack={() => setView('entry')}
           onSelectEntry={handleViewEntry}
+          onAnalyze={() => setView('analyze')}
+        />
+      )}
+
+      {view === 'analyze' && (
+        <AnalyzeHistory
+          // entries={entries}
+          onBack={() => setView('timeline')}
+        // onSelectEntry={handleViewEntry}
+        // onAnalyze={() => setView('analyze')}
         />
       )}
     </>

@@ -41,7 +41,7 @@ function MiniVisual({ entry }: { entry: JournalEntryData }) {
     return <canvas ref={canvasRef} className="w-full h-full rounded-2xl" />;
 }
 
-export default function Timeline({ onBack, onSelectEntry }: TimelineProps) {
+export default function Timeline({ onBack, onSelectEntry, onAnalyze }: TimelineProps) {
     const [entries, setEntries] = useState<JournalEntryData[]>([]);
 
     const fetchEntriesFromDB = async () => {
@@ -114,13 +114,21 @@ export default function Timeline({ onBack, onSelectEntry }: TimelineProps) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-stone-50 to-amber-50">
-            <header className="px-6 py-6">
+            <header className="px-6 py-6 flex">
                 <button
                     onClick={onBack}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 backdrop-blur-sm hover:bg-white/80 transition-all duration-300 text-stone-700 border border-stone-200"
+                    className="mx-2 flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 backdrop-blur-sm hover:bg-white/80 transition-all duration-300 text-stone-700 border border-stone-200"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     <span className="text-sm font-medium">Back</span>
+                </button>
+
+                <button
+                    onClick={onAnalyze}
+                    className="mx-2 flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 backdrop-blur-sm hover:bg-white/80 transition-all duration-300 text-stone-700 border border-stone-200"
+
+                >
+                    Analyze
                 </button>
             </header>
 

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, use } from 'react';
 import { ArrowLeft, Send } from 'lucide-react';
 import { ChatProps, ChatMessage, ChatHistory } from '@/app/constants/interfaces';
-import { SYSTEM_CONTEXT } from '@/lib/ai/systemContext';
+import { SYSTEM_CONTEXT } from '@/lib/ai/prompts/systemContext';
 
 
 

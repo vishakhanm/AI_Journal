@@ -1,21 +1,8 @@
 import clientPromise from "@/lib/database/mongodb";
 import { generateEmbedding } from "@/lib/ai/embeddings";
 import { NextResponse } from "next/server";
+import { cosineSimilarity } from "@/lib/utilities/analyses";
 
-function cosineSimilarity(a: number[], b: number[]) {
-
-    let dot = 0;
-    let magA = 0;
-    let magB = 0;
-
-    for (let i = 0; i < a.length; i++) {
-        dot += a[i] * b[i];
-        magA += a[i] * a[i];
-        magB += b[i] * b[i];
-    }
-
-    return dot / (Math.sqrt(magA) * Math.sqrt(magB));
-}
 
 export async function POST(req: Request) {
 

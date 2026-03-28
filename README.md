@@ -78,11 +78,7 @@ Range limits are enforced to prevent heavy queries.
 
 ## Architecture
 
-User Entry -> LLM Emotion Analysis -> MongoDB (entries collection) -> Generate Embedding -> Vector Database (vectors collection)
-
-Chat flow: User Message -> Vector Similarity Search -> Retrieve Emotional History -> LLM Response -> Save Chat History
-
-Analysis flow: Date Range -> Fetch Entries -> Fetch Chat History -> Fetch Emotional Vectors -> LLM Trend Analysis
+![System Architecture](<system_architecture.png>)
 
 ---
 
